@@ -1,5 +1,6 @@
 from django.utils import timezone
-from ip_tracking.models import RequestLog
+from django.http import HttpResponseForbidden
+from ip_tracking.models import RequestLog, BlockedIP
 
 class IPLoggingMiddleware:
     def __init__(self, get_response):
@@ -9,6 +10,10 @@ class IPLoggingMiddleware:
         # Get IP address from request
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         ip_address = x_forwarded_for.split(',')[0] if x_forwarded_for else request.META.get('REMOTE_ADDR')
+        
+        # Check if IP is blocked
+        if BlockedIP.objects.filter(ip_address=ip_address).exists():
+            return HttpResponseForbidden("Access denied: Your IP is blocked.")
         
         # Get path and timestamp
         path = request.path
