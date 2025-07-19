@@ -1,5 +1,7 @@
 from django.utils import timezone
 from django.http import HttpResponseForbidden
+from django.core.cache import cache
+from django_ipgeolocation.utils import get_ip_geolocation
 from ip_tracking.models import RequestLog, BlockedIP
 
 class IPLoggingMiddleware:
@@ -19,11 +21,31 @@ class IPLoggingMiddleware:
         path = request.path
         timestamp = timezone.now()
 
+        # Check cache for geolocation data
+        cache_key = f"geolocation_{ip_address}"
+        geo_data = cache.get(cache_key)
+        
+        if not geo_data:
+            # Fetch geolocation data if not cached
+            try:
+                response = get_ip_geolocation(ip_address)
+                geo_data = {
+                    'country': response.get('country_name', ''),
+                    'city': response.get('city', '')
+                }
+                # Cache for 24 hours (24 * 60 * 60 seconds)
+                cache.set(cache_key, geo_data, timeout=24 * 60 * 60)
+            except Exception as e:
+                # In case of API failure, set empty values
+                geo_data = {'country': '', 'city': ''}
+        
         # Create and save log entry
         RequestLog.objects.create(
             ip_address=ip_address,
             path=path,
-            timestamp=timestamp
+            timestamp=timestamp,
+            country=geo_data['country'],
+            city=geo_data['city']
         )
 
         # Continue processing the request

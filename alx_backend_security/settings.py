@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ip_tracking',
-    'ip_tracking.middleware.IPLoggingMiddleware'
+    'ip_tracking.middleware.IPLoggingMiddleware',
+    'django_ipgeolocation'
 ]
 
 MIDDLEWARE = [
@@ -123,3 +124,14 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'ip-geolocation-cache',
+    }
+}
+
+IPGEOLOCATION_SETTINGS = {
+    'API_KEY': 'your-ipgeolocation-api-key-here',  # Replace with your API key
+}

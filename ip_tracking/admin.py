@@ -3,9 +3,9 @@ from django.contrib import admin
 
    @admin.register(RequestLog)
    class RequestLogAdmin(admin.ModelAdmin):
-       list_display = ('ip_address', 'path', 'timestamp')
-       list_filter = ('timestamp',)
-       search_fields = ('ip_address', 'path')
+       list_display = ('ip_address', 'path', 'timestamp', 'country', 'city')
+       list_filter = ('timestamp', 'country', 'city')
+       search_fields = ('ip_address', 'path', 'country', 'city')
 
    @admin.register(BlockedIP)
    class BlockedIPAdmin(admin.ModelAdmin):
