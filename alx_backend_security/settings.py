@@ -133,5 +133,5 @@ CACHES = {
 }
 
 IPGEOLOCATION_SETTINGS = {
-    'API_KEY': 'your-ipgeolocation-api-key-here',  # Replace with your API key
+    'API_KEY': '',  
 }
